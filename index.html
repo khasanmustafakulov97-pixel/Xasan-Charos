@@ -14,6 +14,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#efe6d8">
+<link rel="preload" as="image" href="envelope.jpg">
 <link rel="preload" as="image" href="hero.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -129,6 +130,12 @@ body.locked{overflow:hidden}
 @keyframes pulse{0%,100%{box-shadow:0 6px 18px rgba(90,70,40,.12)}50%{box-shadow:0 6px 28px rgba(90,70,40,.28)}}
 
 .env.opening .open-hint{opacity:0}
+.env-photo{position:absolute;inset:0;background:#e9e2d6 url(envelope.jpg) center 50%/cover no-repeat;
+  transform-origin:50% 50.3%;transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+.env.opening .env-photo{transform:scale(1.04)}
+.env.zoom .env-photo{transform:scale(6);filter:blur(2px);transition:transform 1.6s cubic-bezier(.7,0,.25,1),filter 1.6s ease}
+.env-glow{position:absolute;inset:0;background:var(--paper-3);opacity:0;pointer-events:none;transition:opacity 1s ease .55s}
+.env.zoom .env-glow{opacity:1}
 .env.opening .seal{transform:translate(-50%,-50%) scale(1.25);opacity:0}
 .env.opening .flap{transform:rotateX(180deg);transition-delay:.35s}
 .env.opening .card{transform:translateY(-38%);transition-delay:1.2s}
@@ -229,56 +236,8 @@ h2 .ap{font-family:"Cormorant Garamond",Georgia,serif;font-size:.6em;font-weight
 <!-- ============ ENVELOPE ============ -->
 <div class="stage" id="stage">
   <div class="env" id="env" role="button" tabindex="0" aria-label="Taklifnomani ochish">
-    <div class="env-back"></div>
-    <div class="card">
-      <div class="c-names">Xasan</div>
-      <div class="c-amp">&amp;</div>
-      <div class="c-names">Charos</div>
-      <div class="c-date">27 · 11 · 2026</div>
-    </div>
-    <div class="pocket">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        <line x1="0" y1="100" x2="38" y2="57" stroke="#fff" stroke-opacity=".7" stroke-width=".25" vector-effect="non-scaling-stroke"/>
-        <line x1="100" y1="100" x2="62" y2="57" stroke="#fff" stroke-opacity=".7" stroke-width=".25" vector-effect="non-scaling-stroke"/>
-        <line x1="0" y1="100.4" x2="38" y2="57.4" stroke="#b8a888" stroke-opacity=".25" stroke-width=".25" vector-effect="non-scaling-stroke"/>
-        <line x1="100" y1="100.4" x2="62" y2="57.4" stroke="#b8a888" stroke-opacity=".25" stroke-width=".25" vector-effect="non-scaling-stroke"/>
-      </svg>
-    </div>
-    <div class="flap" id="flap">
-      <div class="flap-shape"></div>
-      <div class="flap-back"></div>
-      <svg class="lace" id="lace"></svg>
-    </div>
-    <div class="seal">
-      <svg viewBox="0 0 120 120">
-        <defs>
-          <radialGradient id="wax" cx="40%" cy="35%" r="70%">
-            <stop offset="0" stop-color="#c3cdb0"/><stop offset=".55" stop-color="#a3b08d"/><stop offset="1" stop-color="#7f8e6a"/>
-          </radialGradient>
-          <radialGradient id="waxIn" cx="55%" cy="60%" r="65%">
-            <stop offset="0" stop-color="#b7c2a1"/><stop offset="1" stop-color="#97a581"/>
-          </radialGradient>
-        </defs>
-        <path fill="url(#wax)" d="M60 4c9 0 13 4 20 6s14 1 19 8 3 13 6 20 9 11 9 22-6 14-9 21-1 14-7 20-13 4-19 7-11 8-19 8-12-5-19-8-14-1-19-7-3-13-7-20S6 70 6 60s6-15 9-22 1-13 6-20 13-6 19-8 11-6 20-6z"/>
-        <circle cx="60" cy="60" r="39" fill="url(#waxIn)"/>
-        <circle cx="60" cy="60" r="39" fill="none" stroke="#7d8c68" stroke-opacity=".55" stroke-width="2"/>
-        <circle cx="60" cy="60" r="35.5" fill="none" stroke="#dfe5d2" stroke-opacity=".5" stroke-width="1"/>
-        <g fill="none" stroke="#6f7d5a" stroke-width="1.6" stroke-linecap="round">
-          <path d="M60 88C59 74 60 52 64 34"/>
-        </g>
-        <g fill="#cfd8bd" stroke="#6f7d5a" stroke-width="1.1" stroke-linejoin="round">
-          <path d="M64 34c-6-3-6-10-2-13 4 3 5 9 2 13z"/>
-          <path d="M62 44c-7-1-11-6-9-11 5 1 9 6 9 11z"/>
-          <path d="M63 46c5-4 11-4 13-1-3 4-9 4-13 1z"/>
-          <path d="M61 57c-8 0-13-5-12-10 6 0 11 5 12 10z"/>
-          <path d="M62 59c5-5 12-6 15-3-3 5-10 6-15 3z"/>
-          <path d="M60 70c-8 1-14-3-14-8 6-1 12 3 14 8z"/>
-          <path d="M60 72c5-5 12-7 15-4-3 5-10 7-15 4z"/>
-          <path d="M60 80c-6 2-11 0-12-4 5-2 10 0 12 4z"/>
-        </g>
-        <ellipse cx="44" cy="36" rx="12" ry="6" fill="#fff" opacity=".18" transform="rotate(-35 44 36)"/>
-      </svg>
-    </div>
+    <div class="env-photo"></div>
+    <div class="env-glow"></div>
     <div class="open-hint">OCHISH UCHUN BOSING</div>
   </div>
 </div>
@@ -392,7 +351,6 @@ h2 .ap{font-family:"Cormorant Garamond",Georgia,serif;font-size:.6em;font-weight
       `<g fill="#e4d8c4">${holes}</g>` +
       `<g fill="none" stroke="#d6c7ad" stroke-width=".7" stroke-dasharray="2 2">${lines}</g>`;
   }
-  drawLace(); addEventListener('resize', drawLace);
 
   /* ---------- music: Pachelbel's Canon in D (public domain), synthesized ---------- */
   let ctx, master, playing = false, nextBar = 0, barIdx = 0, timer;
@@ -473,14 +431,14 @@ h2 .ap{font-family:"Cormorant Garamond",Georgia,serif;font-size:.6em;font-weight
     try { startMusic(); } catch(e){}
     scrollTo(0, 0);
     env.classList.add('opening');
-    setTimeout(() => env.classList.add('zoom'), 2700);
+    setTimeout(() => env.classList.add('zoom'), 450);
     setTimeout(() => {
       stage.classList.add('gone');
       document.body.classList.remove('locked');
       document.body.classList.add('opened');
       main.removeAttribute('aria-hidden');
       petals();
-    }, 3500);
+    }, 2000);
   }
   env.addEventListener('click', open);
   env.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); } });
