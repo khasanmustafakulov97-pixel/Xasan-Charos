@@ -14,6 +14,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#efe6d8">
+<link rel="preload" as="image" href="hero.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
@@ -139,7 +140,12 @@ body.locked{overflow:hidden}
 main{max-width:var(--stage-w);margin:0 auto;background:var(--paper) var(--noise);
   box-shadow:0 0 60px rgba(70,50,25,.18);overflow:hidden}
 .hero{position:relative;height:100vh;height:100svh;min-height:560px;overflow:hidden}
-.hero svg.scene{position:absolute;inset:0;width:100%;height:100%}
+.hero .scene-img{position:absolute;inset:0;background:#efe2c8 url(hero.jpg) center 40%/cover no-repeat;
+  transform:scale(1.08);transition:transform 6s cubic-bezier(.2,.7,.2,1)}
+body.opened .hero .scene-img{transform:scale(1)}
+.hero .scene-img::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(60% 30% at 50% 38%,rgba(255,246,228,.55),transparent 70%),
+             linear-gradient(180deg,transparent 70%,rgba(70,50,25,.25))}
 .hero .names{
   position:absolute;left:0;right:0;top:27%;text-align:center;
   font-family:"Great Vibes",cursive;color:#6a5840;line-height:.95;
@@ -153,7 +159,7 @@ body.opened .hero .scroll{opacity:1}
 .hero .names .amp{font-size:clamp(28px,8vw,40px);display:block;color:var(--gold);margin:4px 0}
 .hero .scroll{
   position:absolute;left:0;right:0;bottom:max(26px,env(safe-area-inset-bottom));
-  text-align:center;font-size:22px;color:#7d6c55;text-shadow:0 1px 10px rgba(255,248,232,.9)
+  text-align:center;font-size:22px;color:#fff8ea;text-shadow:0 1px 8px rgba(60,40,15,.6)
 }
 .hero .scroll span{display:block;font-size:26px;animation:bob 1.8s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
@@ -279,7 +285,7 @@ p.lead em{color:var(--sage-d)}
 <!-- ============ INVITATION ============ -->
 <main id="main" aria-hidden="true">
   <header class="hero" id="hero">
-    <svg class="scene" id="scene" viewBox="0 0 400 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+    <div class="scene-img" aria-hidden="true"></div>
     <h1 class="names"><span class="n">Xasan</span><span class="amp">&amp;</span><span class="n">Charos</span></h1>
     <div class="scroll">pastga suring<span>↓</span></div>
   </header>
@@ -559,7 +565,6 @@ p.lead em{color:var(--sage-d)}
     s += `<rect width="${W}" height="${H}" fill="url(#vig)"/>`;
     scene.innerHTML = s;
   }
-  buildScene();
 
   function petals(){
     const hero = document.getElementById('hero');
