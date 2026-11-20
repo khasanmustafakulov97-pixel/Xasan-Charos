@@ -229,6 +229,7 @@ h2 .ap{font-family:"Cormorant Garamond",Georgia,serif;font-size:.6em;font-weight
 </head>
 <body class="locked">
 
+<audio id="bgm" src="music.m4a" preload="auto" loop playsinline></audio>
 <button class="music-btn" id="musicBtn" aria-label="Musiqani yoqish / o'chirish">
   <svg class="note" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
   <span class="eq"><i></i><i></i><i></i></span>
@@ -354,72 +355,27 @@ h2 .ap{font-family:"Cormorant Garamond",Georgia,serif;font-size:.6em;font-weight
       `<g fill="none" stroke="#d6c7ad" stroke-width=".7" stroke-dasharray="2 2">${lines}</g>`;
   }
 
-  /* ---------- music: Pachelbel's Canon in D (public domain), synthesized ---------- */
-  let ctx, master, playing = false, nextBar = 0, barIdx = 0, timer;
-  const BAR = 2.2;
-  const mf = m => 440 * Math.pow(2, (m - 69) / 12);
-  const BASS = [50,45,47,42,43,38,43,45];
-  const CH = [[62,66,69],[61,64,69],[59,62,66],[61,66,69],[59,62,67],[57,62,66],[59,62,67],[57,61,64]];
-  const MEL = [
-    null,
-    [[78],[76],[74],[73],[71],[69],[71],[73]],
-    [[74],[73],[71],[69],[67],[66],[67],[64]],
-    [[74,78],[81,79],[78,74],[78,76],[74,71],[74,69],[67,71],[69,67]],
-    [[78,76],[74,73],[71,73],[74,76],[78,79],[81,78],[79,76],[78,73]]
-  ];
-  function reverb(){
-    const len = ctx.sampleRate * 2.6, buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (let c = 0; c < 2; c++){ const d = buf.getChannelData(c);
-      for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, 3); }
-    const cv = ctx.createConvolver(); cv.buffer = buf; return cv;
-  }
-  function tone(m, t, dur, vol){
-    const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
-    o1.type = 'triangle'; o2.type = 'sine';
-    o1.frequency.value = mf(m); o2.frequency.value = mf(m) * 2;
-    const g2 = ctx.createGain(); g2.gain.value = .25;
-    o1.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(vol, t + .015);
-    g.gain.exponentialRampToValueAtTime(vol * .35, t + .35);
-    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
-    o1.start(t); o2.start(t); o1.stop(t + dur + .05); o2.stop(t + dur + .05);
-  }
-  function scheduleBar(t, cycle, i){
-    tone(BASS[i], t, BAR * 1.1, .22);
-    const ch = CH[i], arp = [ch[0], ch[1], ch[2], ch[1]+12 > 76 ? ch[1] : ch[1]+12, ch[2], ch[1], ch[0]+12, ch[2]];
-    arp.forEach((m, k) => tone(m, t + k * BAR/8, BAR * .6, .055));
-    const mel = MEL[cycle];
-    if (mel){ const notes = mel[i], step = BAR / notes.length;
-      notes.forEach((m, k) => tone(m, t + k*step, step * 1.6, .12)); }
-  }
-  function loop(){
-    while (nextBar < ctx.currentTime + 1.2){
-      const cycle = Math.floor(barIdx / 8), i = barIdx % 8;
-      scheduleBar(nextBar, cycle === 0 ? 0 : 1 + ((cycle - 1) % 4), i);
-      nextBar += BAR; barIdx++;
-    }
+  /* ---------- music: Izzat Shukurov - "Oshiqman" ---------- */
+  const bgm = document.getElementById('bgm');
+  let playing = false, fadeT;
+  function fadeTo(v, ms){
+    clearInterval(fadeT);
+    const from = bgm.volume, t0 = performance.now();
+    fadeT = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / ms);
+      try { bgm.volume = from + (v - from) * k; } catch(e){}
+      if (k >= 1){ clearInterval(fadeT); if (v === 0) bgm.pause(); }
+    }, 50);
   }
   function startMusic(){
-    if (!ctx){
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-      master = ctx.createGain(); master.gain.value = 0;
-      const rv = reverb(), wet = ctx.createGain(); wet.gain.value = .35;
-      master.connect(ctx.destination); master.connect(rv); rv.connect(wet); wet.connect(ctx.destination);
-    }
-    ctx.resume();
-    nextBar = Math.max(nextBar, ctx.currentTime + .1);
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.8, ctx.currentTime + 1.5);
-    clearInterval(timer); timer = setInterval(loop, 250); loop();
+    try { bgm.volume = 0; } catch(e){}
+    const pr = bgm.play();
+    if (pr && pr.catch) pr.catch(() => { playing = false; btn.classList.remove('playing'); });
+    fadeTo(1, 1500);
     playing = true; btn.classList.add('playing');
   }
   function stopMusic(){
-    if (!ctx) return;
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(0, ctx.currentTime + .6);
-    setTimeout(() => { if (!playing){ clearInterval(timer); ctx.suspend(); } }, 700);
+    fadeTo(0, 500);
     playing = false; btn.classList.remove('playing');
   }
   const btn = document.getElementById('musicBtn');
