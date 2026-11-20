@@ -134,6 +134,7 @@ body.locked{overflow:hidden}
   transform-origin:50% 50.3%;transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
 .env.opening .env-photo{transform:scale(1.04)}
 .env.zoom .env-photo{transform:scale(6);filter:blur(2px);transition:transform 1.6s cubic-bezier(.7,0,.25,1),filter 1.6s ease}
+.env-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%;pointer-events:none}
 .env-glow{position:absolute;inset:0;background:var(--paper-3);opacity:0;pointer-events:none;transition:opacity 1s ease .55s}
 .env.zoom .env-glow{opacity:1}
 .env.opening .seal{transform:translate(-50%,-50%) scale(1.25);opacity:0}
@@ -237,6 +238,7 @@ h2 .ap{font-family:"Cormorant Garamond",Georgia,serif;font-size:.6em;font-weight
 <div class="stage" id="stage">
   <div class="env" id="env" role="button" tabindex="0" aria-label="Taklifnomani ochish">
     <div class="env-photo"></div>
+    <video class="env-video" id="envVid" src="opening.mp4" poster="envelope.jpg" muted playsinline webkit-playsinline preload="auto" disablepictureinpicture></video>
     <div class="env-glow"></div>
     <div class="open-hint">OCHISH UCHUN BOSING</div>
   </div>
@@ -431,14 +433,27 @@ h2 .ap{font-family:"Cormorant Garamond",Georgia,serif;font-size:.6em;font-weight
     try { startMusic(); } catch(e){}
     scrollTo(0, 0);
     env.classList.add('opening');
-    setTimeout(() => env.classList.add('zoom'), 450);
-    setTimeout(() => {
+    let done = false;
+    const finish = () => {
+      if (done) return; done = true;
       stage.classList.add('gone');
       document.body.classList.remove('locked');
       document.body.classList.add('opened');
       main.removeAttribute('aria-hidden');
       petals();
-    }, 2000);
+    };
+    const vid = document.getElementById('envVid');
+    const fallback = () => {               // if the video cannot play: simple zoom into the seal
+      if (done || env.classList.contains('zoom')) return;
+      vid.style.display = 'none';
+      env.classList.add('zoom');
+      setTimeout(finish, 1500);
+    };
+    vid.addEventListener('ended', () => setTimeout(finish, 150), { once: true });
+    const pr = vid.play();
+    if (pr && pr.catch) pr.catch(fallback);
+    setTimeout(() => { if (!done && (vid.paused || vid.currentTime < 0.2)) fallback(); }, 1500);
+    setTimeout(finish, 5000);
   }
   env.addEventListener('click', open);
   env.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); } });
